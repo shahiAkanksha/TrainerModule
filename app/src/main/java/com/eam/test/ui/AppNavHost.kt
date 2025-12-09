@@ -14,16 +14,6 @@ fun AppNavHost(viewModel: MainViewModel) {
     val navController = rememberNavController()
 
     NavHost(navController, startDestination = "list") {
-
-        composable("list") {
-            ModuleListScreen(
-                modules = viewModel.modules.collectAsState().value,
-                onItemClick = { id ->
-                    navController.navigate("detail/$id")
-                }
-            )
-        }
-
         composable(
             "detail/{id}",
             arguments = listOf(navArgument("id") { type = NavType.IntType })
@@ -36,5 +26,17 @@ fun AppNavHost(viewModel: MainViewModel) {
                 onStatusChange = { viewModel.toggleStatus(module.id, it) }
             )
         }
+        composable("list") {
+            val state = viewModel.modules.collectAsState().value
+            val filter = viewModel.filter.collectAsState().value
+
+            ModuleListScreen(
+                modules = state,
+                currentFilter = filter,
+                onFilterChange = { viewModel.setFilter(it) },
+                onItemClick = { id -> navController.navigate("detail/$id") }
+            )
+        }
+
     }
 }

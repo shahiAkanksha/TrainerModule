@@ -13,36 +13,65 @@ import com.eam.test.data.TrainingModule
 @Composable
 fun ModuleListScreen(
     modules: List<TrainingModule>,
+    currentFilter: FilterType,
+    onFilterChange: (FilterType) -> Unit,
     onItemClick: (Int) -> Unit
 ) {
     Scaffold(
         topBar = { TopAppBar(title = { Text("Training Modules") }) }
     ) { padding ->
 
-        LazyColumn(
-            modifier = Modifier.padding(padding).padding(12.dp)
-        ) {
-            items(modules.size) { index ->
-                val module = modules[index]
+        Column(modifier = Modifier.padding(padding).padding(12.dp)) {
 
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 6.dp)
-                        .clickable { onItemClick(module.id) },
-                    elevation = CardDefaults.cardElevation(4.dp)
-                ) {
-                    Column(modifier = Modifier.padding(16.dp)) {
-                        Text(module.title, style = MaterialTheme.typography.titleMedium)
-                        Text(module.description, style = MaterialTheme.typography.bodyMedium)
-                        Text(
-                            if (module.isCompleted) "Completed" else "Pending",
-                            color = if (module.isCompleted) MaterialTheme.colorScheme.primary
-                            else MaterialTheme.colorScheme.error
-                        )
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
+
+                FilterChip(
+                    selected = currentFilter == FilterType.ALL,
+                    onClick = { onFilterChange(FilterType.ALL) },
+                    label = { Text("All") }
+                )
+
+                FilterChip(
+                    selected = currentFilter == FilterType.COMPLETED,
+                    onClick = { onFilterChange(FilterType.COMPLETED) },
+                    label = { Text("Completed") }
+                )
+
+                FilterChip(
+                    selected = currentFilter == FilterType.PENDING,
+                    onClick = { onFilterChange(FilterType.PENDING) },
+                    label = { Text("Pending") }
+                )
+            }
+
+            Spacer(Modifier.height(12.dp))
+
+            LazyColumn {
+                items(modules.size) { index ->
+                    val module = modules[index]
+
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 6.dp)
+                            .clickable { onItemClick(module.id) },
+                        elevation = CardDefaults.cardElevation(4.dp)
+                    ) {
+                        Column(modifier = Modifier.padding(16.dp)) {
+                            Text(module.title, style = MaterialTheme.typography.titleMedium)
+                            Text(module.description)
+                            Text(
+                                if (module.isCompleted) "Completed" else "Pending",
+                                color = if (module.isCompleted)
+                                    MaterialTheme.colorScheme.primary
+                                else
+                                    MaterialTheme.colorScheme.error
+                            )
+                        }
                     }
                 }
             }
         }
     }
 }
+
